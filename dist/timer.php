@@ -9,6 +9,24 @@
 //   header("Location: https://cstimer.net".$_SERVER["REQUEST_URI"]);
 //   die(0);
 // }
+// To the extent possible under law, I (Stephan Sokolow) waive all copyright and related or 
+// neighbouring rights to this code snippet. (Though it'd still be nice if you mention me)
+
+// If we're running under `php -S` with PHP 5.4.0+
+if (php_sapi_name() == 'cli-server') {
+
+    // Replicate the effects of basic "index.php"-hiding mod_rewrite rules
+    // Tested working under FatFreeFramework 2.0.6 through 2.0.12.
+    $_SERVER['SCRIPT_NAME'] = str_replace(__DIR__, '', __FILE__);
+    $_SERVER['SCRIPT_FILENAME'] = __FILE__;
+
+    // Replicate the FatFree/WordPress/etc. .htaccess "serve existing files" bit
+    $url_parts = parse_url($_SERVER["REQUEST_URI"]);
+    $_req = rtrim($_SERVER['DOCUMENT_ROOT'] . $url_parts['path'], '/' . DIRECTORY_SEPARATOR);
+    if (__FILE__ !== $_req && __DIR__ !== $_req && file_exists($_req)) {
+        return false;    // serve the requested resource as-is.
+    }
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html manifest="cache.manifest">

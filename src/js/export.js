@@ -1,21 +1,8 @@
 "use strict";
 
 var exportFunc = execMain(function() {
-	var wcaLoginUrl = 'https://www.worldcubeassociation.org/oauth/authorize?client_id=63a89d6694b1ea2d7b7cbbe174939a4d2adf8dd26e69acacd1280af7e7727554&response_type=code&scope=public&redirect_uri=' + encodeURI(location.href.split('?')[0]);
-	var gglLoginUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=738060786798-octf9tngnn8ibd6kau587k34au263485.apps.googleusercontent.com&response_type=token&scope=https://www.googleapis.com/auth/drive.appdata&redirect_uri=' + encodeURI(location.href.split('?')[0]);
-
 	var exportDiv = $('<div />');
 	var exportTable = $('<table class="expOauth expUpDown">');
-
-	var wcaDataTd = $('<td></td>');
-	var wcaDataTr = $('<tr>').append('<td class="img"/>', wcaDataTd);
-	var inServWCA = $('<a class="click"/>').html(EXPORT_FROMSERV + ' (csTimer)').click(downloadData);
-	var outServWCA = $('<a class="click"/>').html(EXPORT_TOSERV + ' (csTimer)').click(uploadDataClk);
-
-	var gglDataTd = $('<td></td>');
-	var gglDataTr = $('<tr>').append('<td class="img"/>', gglDataTd);
-	var inServGGL = $('<a class="click"/>');
-	var outServGGL = $('<a class="click"/>');
 
 	var inFile = $('<input type="file" id="file" accept="text/*"/>');
 	var inOtherFile = $('<input type="file" id="file" accept="text/*"/>');
@@ -139,39 +126,6 @@ var exportFunc = execMain(function() {
 			return;
 		}
 		return id;
-	}
-
-	function uploadData(id) {
-		return new Promise(function(resolve, reject) {
-			var compExpString = LZString.compressToEncodedURIComponent(expString);
-			$.post('https://cstimer.net/userdata.php', {
-				'id': id,
-				'data': compExpString
-			}, function(val) {
-				if (val['retcode'] == 0) {
-					resolve(val);
-				} else {
-					reject(val);
-				}
-			}, 'json').error(reject);
-		});
-	}
-
-	function uploadDataClk(e) {
-		var id = getId(e);
-		if (!id) {
-			return;
-		}
-		var target = $(e.target);
-		var rawText = target.html();
-		target.html('...');
-		uploadData(id).then(function() {
-			alert(EXPORT_UPLOADED);
-		}, function() {
-			alert(EXPORT_ERROR);
-		}).then(function() {
-			target.html(rawText);
-		});
 	}
 
 	function downloadData(e) {
@@ -515,11 +469,6 @@ var exportFunc = execMain(function() {
 					kernel.setProp('atexpa', 'n');
 					return;
 				}
-				uploadData(id).then(function() {
-					logohint.push('Auto Export Success');
-				}, function() {
-					logohint.push('Auto Export Failed');
-				});
 			} else if (atexpa == 'f') {
 				if (window.Blob) {
 					var blob = new Blob([expString], {
